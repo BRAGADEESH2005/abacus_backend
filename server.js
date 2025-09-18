@@ -32,6 +32,11 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Welcome to Abacus Spaces");
+});
+
 // Health check route
 app.get("/api/health", (req, res) => {
   res.status(200).json({

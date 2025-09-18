@@ -37,6 +37,14 @@ app.get("/", (req, res) => {
   res.send("Welcome to Abacus Spaces");
 });
 
+// Simple auth route - returns admin credentials
+app.get("/api/auth/credentials", (req, res) => {
+  res.json({
+    username: process.env.ADMIN_USERNAME ,
+    password: process.env.ADMIN_PASSWORD
+  });
+});
+
 // Health check route
 app.get("/api/health", (req, res) => {
   res.status(200).json({

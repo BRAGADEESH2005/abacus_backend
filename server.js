@@ -37,12 +37,32 @@ app.get("/", (req, res) => {
   res.send("Welcome to Abacus Spaces");
 });
 
-// Simple auth route - returns admin credentials
-app.get("/api/auth/credentials", (req, res) => {
-  res.json({
-    username: process.env.ADMIN_USERNAME ,
-    password: process.env.ADMIN_PASSWORD
-  });
+// Secure login route - validates credentials without exposing them
+app.post("/api/auth/login", (req, res) => {
+  const { username, password } = req.body;
+
+  // Validate input
+  if (!username || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Username and password are required"
+    });
+  }
+
+  const validUsername = process.env.ADMIN_USERNAME || "admin";
+  const validPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+  if (username === validUsername && password === validPassword) {
+    res.json({
+      success: true,
+      message: "Login successful"
+    });
+  } else {
+    res.status(401).json({
+      success: false,
+      message: "Invalid username or password"
+    });
+  }
 });
 
 // Health check route

@@ -34,7 +34,7 @@ const leadSchema = new mongoose.Schema({
     maxlength: 100
   },
   
-  // Space Requirements
+  // Space Requirements (for space calculator)
   spaceRequirements: {
     workstations: {
       type: { type: String, enum: ['compact', 'standard', 'spacious'], default: 'compact' },
@@ -65,18 +65,31 @@ const leadSchema = new mongoose.Schema({
     }
   },
   
+  // Property Details (for property report requests)
+  propertyDetails: {
+    propertyId: { type: mongoose.Schema.Types.ObjectId, default: null },
+    propertyCode: { type: String, default: null },
+    title: { type: String, default: null },
+    location: { type: String, default: null },
+    area: { type: String, default: null },
+    price: { type: String, default: null },
+    type: { type: String, default: null },
+    features: [{ type: String }]
+  },
+  
   // Calculated Results
   totalArea: {
     type: Number,
     required: true,
-    min: 0
+    min: 0,
+    default: 0
   },
   
   // Source tracking
   source: {
     type: String,
     required: true,
-    enum: ['spacecalculator', 'contactform', 'inquiry', 'direct'],
+    enum: ['spacecalculator', 'propertyreport', 'contactform', 'inquiry', 'direct'],
     default: 'spacecalculator'
   },
   
@@ -119,6 +132,7 @@ leadSchema.index({ email: 1 });
 leadSchema.index({ source: 1 });
 leadSchema.index({ status: 1 });
 leadSchema.index({ createdAt: -1 });
+leadSchema.index({ 'propertyDetails.propertyId': 1 });
 
 // Virtual for formatted total area
 leadSchema.virtual('formattedTotalArea').get(function() {

@@ -3,17 +3,17 @@ const nodemailer = require("nodemailer");
 
 // Email configuration
 const createEmailTransporter = () => {
-  return nodemailer.createTransport({  // Fixed: createTransport instead of createTransporter
-    service: 'gmail', // or your email service
+  return nodemailer.createTransport({
+    service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER, // Your email
-      pass: process.env.EMAIL_PASSWORD // Your email password or app password
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
     }
   });
 };
 
-// Generate email template
-const generateEmailTemplate = (lead) => {
+// Generate email template for space calculator
+const generateSpaceCalculatorEmailTemplate = (lead) => {
   const spaceBreakdown = lead.getSpaceBreakdown();
   
   return `
@@ -61,28 +61,6 @@ const generateEmailTemplate = (lead) => {
           </div>
           
           <div class="info-section">
-            <h2>📊 Detailed Requirements</h2>
-            ${lead.spaceRequirements.workstations.persons > 0 ? `
-              <p><strong>Workstations:</strong> ${lead.spaceRequirements.workstations.persons} persons (${lead.spaceRequirements.workstations.type}) - ${lead.spaceRequirements.workstations.area} sq.ft</p>
-            ` : ''}
-            ${lead.spaceRequirements.cabins.count > 0 ? `
-              <p><strong>Cabins:</strong> ${lead.spaceRequirements.cabins.count} cabin(s) - ${lead.spaceRequirements.cabins.area} sq.ft</p>
-            ` : ''}
-            ${lead.spaceRequirements.reception.count > 0 ? `
-              <p><strong>Reception:</strong> ${lead.spaceRequirements.reception.count} reception(s) - ${lead.spaceRequirements.reception.area} sq.ft</p>
-            ` : ''}
-            ${lead.spaceRequirements.pantry.count > 0 ? `
-              <p><strong>Pantry:</strong> ${lead.spaceRequirements.pantry.count} pantry(s) (${lead.spaceRequirements.pantry.type}) - ${lead.spaceRequirements.pantry.area} sq.ft</p>
-            ` : ''}
-            ${lead.spaceRequirements.conferenceRoom.count > 0 ? `
-              <p><strong>Conference Room:</strong> ${lead.spaceRequirements.conferenceRoom.count} room(s) (${lead.spaceRequirements.conferenceRoom.type}) - ${lead.spaceRequirements.conferenceRoom.area} sq.ft</p>
-            ` : ''}
-            ${lead.spaceRequirements.serverRoom.count > 0 ? `
-              <p><strong>Server Room:</strong> ${lead.spaceRequirements.serverRoom.count} room(s) - ${lead.spaceRequirements.serverRoom.area} sq.ft</p>
-            ` : ''}
-          </div>
-          
-          <div class="info-section">
             <h2>🕒 Inquiry Details</h2>
             <p><strong>Source:</strong> Space Calculator</p>
             <p><strong>Date & Time:</strong> ${new Date(lead.createdAt).toLocaleString()}</p>
@@ -100,16 +78,85 @@ const generateEmailTemplate = (lead) => {
   `;
 };
 
+// Generate email template for property report requests
+const generatePropertyReportEmailTemplate = (lead, propertyDetails) => {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #23c6a4, #1a2f5c); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+        .content { background: #f9f9f9; padding: 20px; }
+        .footer { background: #333; color: white; padding: 15px; text-align: center; border-radius: 0 0 8px 8px; }
+        .info-section { background: white; margin: 15px 0; padding: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .highlight { background: #23c6a4; color: white; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0; }
+        .property-item { background: #f0f9ff; padding: 10px; margin: 5px 0; border-left: 4px solid #23c6a4; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>📄 New Property Report Request</h1>
+          <p>A potential client has requested a property report from your listings</p>
+        </div>
+        
+        <div class="content">
+          <div class="info-section">
+            <h2>👤 Client Information</h2>
+            <p><strong>Name:</strong> ${lead.name}</p>
+            <p><strong>Company:</strong> ${lead.company}</p>
+            <p><strong>Designation:</strong> ${lead.designation}</p>
+            <p><strong>Phone:</strong> ${lead.phone}</p>
+            <p><strong>Email:</strong> ${lead.email}</p>
+          </div>
+          
+          <div class="highlight">
+            <h2>🏢 Requested Property</h2>
+            <h3>${propertyDetails.title}</h3>
+            <p><strong>Property Code:</strong> ${propertyDetails.propertyCode}</p>
+          </div>
+          
+          <div class="info-section">
+            <h2>🏗️ Property Details</h2>
+            <div class="property-item">📍 <strong>Location:</strong> ${propertyDetails.location}</div>
+            <div class="property-item">📐 <strong>Area:</strong> ${propertyDetails.area}</div>
+            <div class="property-item">💰 <strong>Price:</strong> ${propertyDetails.price}</div>
+            <div class="property-item">🏗️ <strong>Type:</strong> ${propertyDetails.type}</div>
+            ${propertyDetails.features && propertyDetails.features.length > 0 ? `
+              <div class="property-item">✨ <strong>Features:</strong> ${propertyDetails.features.join(', ')}</div>
+            ` : ''}
+          </div>
+          
+          <div class="info-section">
+            <h2>🕒 Request Details</h2>
+            <p><strong>Source:</strong> Property Report Request</p>
+            <p><strong>Date & Time:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Status:</strong> New Lead</p>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>💼 <strong>Action Required:</strong> Please send the property report and follow up within 24 hours</p>
+          <p>📧 Reply to: ${lead.email} | 📞 Call: ${lead.phone}</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
 // Create new lead
 const createLead = async (req, res) => {
   try {
-    const { userInfo, spaceData, totalArea } = req.body;
+    const { userInfo, spaceData, totalArea, propertyDetails, source, requestType } = req.body;
     
-    // Validate required fields
-    if (!userInfo || !spaceData || !totalArea) {
+    // Validate userInfo is present
+    if (!userInfo) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields"
+        message: "User information is required"
       });
     }
     
@@ -125,34 +172,97 @@ const createLead = async (req, res) => {
     // Get client IP address
     const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 'unknown';
     
-    // Create new lead
-    const leadData = {
-      name: userInfo.name,
-      company: userInfo.company,
-      designation: userInfo.designation,
-      phone: userInfo.phone,
-      email: userInfo.email,
-      spaceRequirements: spaceData,
-      totalArea: totalArea,
-      source: 'spacecalculator',
-      ipAddress: ipAddress
-    };
+    let leadData;
+    let emailTemplate;
+    let emailSubject;
+    let clientEmailSubject;
+    let clientEmailContent;
+    
+    // Handle different types of requests
+    if (requestType === 'property_report' && propertyDetails) {
+      // Property report request
+      leadData = {
+        name: userInfo.name,
+        company: userInfo.company,
+        designation: userInfo.designation,
+        phone: userInfo.phone,
+        email: userInfo.email,
+        spaceRequirements: {
+          workstations: { type: 'compact', persons: 0, area: 0 },
+          cabins: { count: 0, area: 0 },
+          reception: { count: 0, area: 0 },
+          pantry: { type: '10pax', count: 0, area: 0 },
+          conferenceRoom: { type: '7pax', count: 0, area: 0 },
+          serverRoom: { count: 0, area: 0 }
+        },
+        totalArea: 0,
+        source: source || 'propertyreport',
+        ipAddress: ipAddress,
+        propertyDetails: propertyDetails
+      };
+      
+      emailSubject = `📄 Property Report Request - ${propertyDetails.title} - ${userInfo.company}`;
+      clientEmailSubject = `Thank you for your property report request - Abacus Spaces`;
+      clientEmailContent = `
+        <div class="highlight">
+          <h3>Requested Property</h3>
+          <h4>${propertyDetails.title}</h4>
+          <p>${propertyDetails.location} • ${propertyDetails.area} • ${propertyDetails.price}</p>
+          <p><strong>Property Code:</strong> ${propertyDetails.propertyCode}</p>
+        </div>
+      `;
+    } else if (spaceData && totalArea !== undefined) {
+      // Space calculator request
+      leadData = {
+        name: userInfo.name,
+        company: userInfo.company,
+        designation: userInfo.designation,
+        phone: userInfo.phone,
+        email: userInfo.email,
+        spaceRequirements: spaceData,
+        totalArea: totalArea,
+        source: source || 'spacecalculator',
+        ipAddress: ipAddress
+      };
+      
+      emailSubject = `🏢 New Space Calculator Inquiry - ${userInfo.company}`;
+      clientEmailSubject = `Thank you for your space calculation inquiry - Abacus Spaces`;
+      clientEmailContent = `
+        <div class="highlight">
+          <h3>Your Space Calculation</h3>
+          <div class="total-area">${totalArea.toLocaleString()} sq.ft</div>
+          <p>Total area required for ${userInfo.company}</p>
+        </div>
+      `;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request: Missing space data or property details"
+      });
+    }
     
     const newLead = new Lead(leadData);
     const savedLead = await newLead.save();
     
-    console.log(`New lead created: ${savedLead._id} for ${userInfo.company}`);
+    console.log(`New lead created: ${savedLead._id} for ${userInfo.company} (${savedLead.source})`);
     
     // Send email notification to admin
     if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
       try {
         const transporter = createEmailTransporter();
         
+        // Generate appropriate email template
+        if (requestType === 'property_report') {
+          emailTemplate = generatePropertyReportEmailTemplate(savedLead, propertyDetails);
+        } else {
+          emailTemplate = generateSpaceCalculatorEmailTemplate(savedLead);
+        }
+        
         const mailOptions = {
           from: process.env.EMAIL_USER,
           to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-          subject: `🏢 New Space Calculator Inquiry - ${userInfo.company}`,
-          html: generateEmailTemplate(savedLead)
+          subject: emailSubject,
+          html: emailTemplate
         };
         
         await transporter.sendMail(mailOptions);
@@ -175,7 +285,7 @@ const createLead = async (req, res) => {
         const clientMailOptions = {
           from: process.env.EMAIL_USER,
           to: userInfo.email,
-          subject: `Thank you for your space calculation inquiry - Abacus Spaces`,
+          subject: clientEmailSubject,
           html: `
             <!DOCTYPE html>
             <html>
@@ -200,20 +310,16 @@ const createLead = async (req, res) => {
                 <div class="content">
                   <h2>Dear ${userInfo.name},</h2>
                   
-                  <p>Thank you for using our Space Calculator! We've received your inquiry for office space requirements.</p>
+                  <p>Thank you for your inquiry! We've received your request and our team is reviewing it.</p>
                   
-                  <div class="highlight">
-                    <h3>Your Space Calculation</h3>
-                    <div class="total-area">${savedLead.formattedTotalArea}</div>
-                    <p>Total area required for ${userInfo.company}</p>
-                  </div>
+                  ${clientEmailContent}
                   
                   <p><strong>What happens next?</strong></p>
                   <ul>
                     <li>Our team will review your requirements within 24 hours</li>
                     <li>We'll contact you to discuss available options</li>
                     <li>Schedule a site visit if needed</li>
-                    <li>Provide you with customized proposals</li>
+                    <li>Provide you with ${requestType === 'property_report' ? 'detailed property information' : 'customized proposals'}</li>
                   </ul>
                   
                   <p>In the meantime, feel free to browse our available listings or contact us directly:</p>
@@ -243,11 +349,12 @@ const createLead = async (req, res) => {
     
     res.status(201).json({
       success: true,
-      message: "Space calculation saved successfully",
+      message: requestType === 'property_report' ? "Property report request submitted successfully" : "Space calculation saved successfully",
       data: {
         leadId: savedLead._id,
         totalArea: savedLead.totalArea,
-        formattedTotalArea: savedLead.formattedTotalArea
+        formattedTotalArea: savedLead.formattedTotalArea || `${savedLead.totalArea} sq.ft`,
+        source: savedLead.source
       }
     });
     
@@ -255,7 +362,7 @@ const createLead = async (req, res) => {
     console.error("Error creating lead:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to save space calculation",
+      message: "Failed to save request",
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }

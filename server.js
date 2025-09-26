@@ -19,7 +19,10 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? ["https://abacus-space.vercel.app"]
+        ? [
+            "https://abacus-space.vercel.app",
+            "https://abacuspaces.com", // add your Hostinger domain here
+          ]
         : ["http://localhost:3000", "http://localhost:3001"],
     credentials: true,
   })
@@ -34,7 +37,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Trust proxy for IP addresses
-app.set('trust proxy', true);
+app.set("trust proxy", true);
 
 // Root route
 app.get("/", (req, res) => {
@@ -49,7 +52,7 @@ app.post("/api/auth/login", (req, res) => {
   if (!username || !password) {
     return res.status(400).json({
       success: false,
-      message: "Username and password are required"
+      message: "Username and password are required",
     });
   }
 
@@ -59,12 +62,12 @@ app.post("/api/auth/login", (req, res) => {
   if (username === validUsername && password === validPassword) {
     res.json({
       success: true,
-      message: "Login successful"
+      message: "Login successful",
     });
   } else {
     res.status(401).json({
       success: false,
-      message: "Invalid username or password"
+      message: "Invalid username or password",
     });
   }
 });

@@ -10,20 +10,15 @@ const leadRoutes = require("./routes/leadRoute"); // Add this line
 
 // Initialize Express app
 const app = express();
-
-// Connect to MongoDB
-connectDB();
-
 // Middleware
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? "https://abacus-space.vercel.app"
-        : "http://localhost:3000",
+    origin: "https://abacus-space.vercel.app",
     credentials: true,
   })
 );
+// Connect to MongoDB
+connectDB();
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));

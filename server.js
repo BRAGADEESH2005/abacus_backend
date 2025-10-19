@@ -22,6 +22,7 @@ app.use(
         ? [
             "https://abacus-space.vercel.app",
             "https://abacuspaces.com", // add your Hostinger domain here
+            "https://abacus-backend-chi.vercel.app"
           ]
         : ["http://localhost:3000", "http://localhost:3001"],
     credentials: true,

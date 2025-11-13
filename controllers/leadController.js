@@ -1,13 +1,18 @@
 const Lead = require("../models/leadModel");
 const nodemailer = require("nodemailer");
 
-// Email configuration
+// Email configuration for Hostinger
 const createEmailTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.EMAIL_HOST || 'smtp.hostinger.com',
+    port: parseInt(process.env.EMAIL_PORT) || 465,
+    secure: process.env.EMAIL_SECURE === 'true' || true, // true for 465, false for other ports
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD
+    },
+    tls: {
+      rejectUnauthorized: false
     }
   });
 };
@@ -259,7 +264,7 @@ const createLead = async (req, res) => {
         }
         
         const mailOptions = {
-          from: process.env.EMAIL_USER,
+          from: `"Abacus Spaces" <${process.env.EMAIL_USER}>`,
           to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
           subject: emailSubject,
           html: emailTemplate
@@ -283,7 +288,7 @@ const createLead = async (req, res) => {
         const transporter = createEmailTransporter();
         
         const clientMailOptions = {
-          from: process.env.EMAIL_USER,
+          from: `"Abacus Spaces" <${process.env.EMAIL_USER}>`,
           to: userInfo.email,
           subject: clientEmailSubject,
           html: `

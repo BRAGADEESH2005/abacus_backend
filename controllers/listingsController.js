@@ -7,7 +7,7 @@ const {
 // Helper function to validate property code format
 const validatePropertyCodeFormat = (propertyCode) => {
   // Format: XXX-X-XXX (e.g., BLR-O-001)
-  const codePattern = /^[A-Z]{3}-[ORC]-\d{3}$/;
+  const codePattern = /^[A-Z]{3}-[ORH]-\d{3}$/;
   return codePattern.test(propertyCode);
 };
 
@@ -150,11 +150,13 @@ const createListing = async (req, res) => {
 
     // Validate required fields
     if (!title || !type || !location || !area || !price) {
+      console.log("Validation failed: Missing required fields");
       return res.status(400).json({
         success: false,
         message: "Missing required fields: title, type, location, area, price",
       });
     }
+    console.log("problem 1 is paased")
 
     // Validate features
     const validFeatures = features.filter(
@@ -163,6 +165,7 @@ const createListing = async (req, res) => {
     );
 
     if (validFeatures.length === 0) {
+      console.log("Validation failed: No valid features provided");
       return res.status(400).json({
         success: false,
         message: "At least one feature is required",
@@ -171,6 +174,7 @@ const createListing = async (req, res) => {
 
     // Validate images
     if (!images || images.length === 0) {
+      console.log("Validation failed: No images provided");
       return res.status(400).json({
         success: false,
         message: "At least one image is required",
@@ -198,6 +202,7 @@ const createListing = async (req, res) => {
       const trimmedCode = providedPropertyCode.trim();
 
       if (!validatePropertyCodeFormat(trimmedCode)) {
+        console.log("Validation failed: Invalid property code format");
         return res.status(400).json({
           success: false,
           message:

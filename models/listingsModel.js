@@ -12,8 +12,8 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: [true, "Property type is required"],
       enum: {
-        values: ["Office", "Retail", "Co-Working"],
-        message: "Type must be Office, Retail, or Co-Working",
+        values: ["Office", "Retail", "Hospitality & Healthcare"],
+        message: "Type must be Office, Retail, or Hospitality & Healthcare",
       },
     },
     location: {

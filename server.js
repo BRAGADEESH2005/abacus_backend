@@ -6,7 +6,8 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const listingsRoutes = require("./routes/listingsRoute");
 const imageRoutes = require("./routes/imageRoute");
-const leadRoutes = require("./routes/leadRoute"); // Add this line
+const leadRoutes = require("./routes/leadRoute");
+const contentRoutes = require("./routes/contentRoute"); // Add this line
 
 // Initialize Express app
 const app = express();
@@ -77,7 +78,8 @@ app.get("/api/health", (req, res) => {
 // API Routes
 app.use("/api/listings", listingsRoutes);
 app.use("/api/images", imageRoutes);
-app.use("/api/leads", leadRoutes); // Add this line
+app.use("/api/leads", leadRoutes);
+app.use("/api/content", contentRoutes); // Add this line
 
 // Handle undefined routes
 app.use((req, res) => {
@@ -111,6 +113,7 @@ const server = app.listen(PORT, () => {
   console.log(`📋 Listings API: http://localhost:${PORT}/api/listings`);
   console.log(`🖼️  Images API: http://localhost:${PORT}/api/images`);
   console.log(`👥 Leads API: http://localhost:${PORT}/api/leads`);
+  console.log(`📝 Content API: http://localhost:${PORT}/api/content`); // Add this line
 });
 
 // Handle unhandled promise rejections

@@ -8,15 +8,20 @@ const listingsRoutes = require("./routes/listingsRoute");
 const imageRoutes = require("./routes/imageRoute");
 const leadRoutes = require("./routes/leadRoute");
 const contentRoutes = require("./routes/contentRoute"); // Add this line
+const subscriptionRoute = require("./routes/subscriptionRoute");
 
 // Initialize Express app
 const app = express();
 // Middleware
 app.use(
   cors({
-    origin: ["https://abacuspaces.com","https://abacus-space.vercel.app","http://localhost:3000"],
+    origin: [
+      "https://abacuspaces.com",
+      "https://abacus-space.vercel.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
-  })
+  }),
 );
 // Connect to MongoDB
 connectDB();
@@ -80,6 +85,7 @@ app.use("/api/listings", listingsRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/leads", leadRoutes);
 app.use("/api/content", contentRoutes); // Add this line
+app.use("/api/subscriptions", subscriptionRoute);
 
 // Handle undefined routes
 app.use((req, res) => {
@@ -105,7 +111,7 @@ const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(
-    `🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`
+    `🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`,
   );
   console.log(`🏠 Root URL: http://localhost:${PORT}/`);
   console.log(`🔐 Auth Login: http://localhost:${PORT}/api/auth/login`);

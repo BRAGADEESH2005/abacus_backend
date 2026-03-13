@@ -7,10 +7,23 @@ const {
 // @desc    Create new content
 // @route   POST /api/content
 // @access  Private
+// @desc    Create new content
+// @route   POST /api/content
+// @access  Private
 const createContent = async (req, res) => {
   try {
-    const { type, sector, title, text, date, imageUrl, status, author, tags } =
-      req.body;
+    const {
+      type,
+      sector,
+      title,
+      text,
+      date,
+      imageUrl,
+      status,
+      author,
+      tags,
+      views,
+    } = req.body;
 
     // Validate required fields
     if (!type || !sector || !title || !text || !imageUrl) {
@@ -20,6 +33,15 @@ const createContent = async (req, res) => {
           "Please provide all required fields: type, sector, title, text, and imageUrl",
       });
     }
+
+    // Validate views if provided
+    if (views !== undefined && (typeof views !== "number" || views < 0)) {
+      return res.status(400).json({
+        success: false,
+        message: "Views must be a non-negative number",
+      });
+    }
+
     console.log("Received content creation request with images:", imageUrl);
     // Parse imageUrl (it's already a Cloudinary URL from /images/upload endpoint)
     const imageData = {
@@ -38,6 +60,7 @@ const createContent = async (req, res) => {
       status: status || "Published",
       author: author || "Abacus Spaces",
       tags: tags || [],
+      views: views || 0,
     });
 
     res.status(201).json({
@@ -197,8 +220,26 @@ const updateContent = async (req, res) => {
       });
     }
 
-    const { type, sector, title, text, date, imageUrl, status, author, tags } =
-      req.body;
+    const {
+      type,
+      sector,
+      title,
+      text,
+      date,
+      imageUrl,
+      status,
+      author,
+      tags,
+      views,
+    } = req.body;
+
+    // Validate views if provided
+    if (views !== undefined && (typeof views !== "number" || views < 0)) {
+      return res.status(400).json({
+        success: false,
+        message: "Views must be a non-negative number",
+      });
+    }
 
     // Update fields
     if (type) content.type = type;
@@ -209,6 +250,7 @@ const updateContent = async (req, res) => {
     if (status) content.status = status;
     if (author) content.author = author;
     if (tags) content.tags = tags;
+    if (views !== undefined) content.views = views; // Add this line
 
     // Handle image update
     if (imageUrl) {

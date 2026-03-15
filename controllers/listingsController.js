@@ -142,6 +142,7 @@ const createListing = async (req, res) => {
       area,
       price,
       images = [],
+      videoUrls = [],
       features = [],
       viewsRange = [100, 300],
       propertyCode: providedPropertyCode, // Can be provided by admin
@@ -156,7 +157,7 @@ const createListing = async (req, res) => {
         message: "Missing required fields: title, type, location, area, price",
       });
     }
-    console.log("problem 1 is paased")
+    console.log("problem 1 is paased");
 
     // Validate features
     const validFeatures = features.filter(
@@ -180,6 +181,11 @@ const createListing = async (req, res) => {
         message: "At least one image is required",
       });
     }
+
+    // Validate and clean video URLs
+    const validVideoUrls = videoUrls.filter(
+      (url) => url && typeof url === "string" && url.trim() !== ""
+    );
 
     // Handle property code: use provided value if valid, otherwise auto-generate
     let propertyCode;
@@ -238,6 +244,7 @@ const createListing = async (req, res) => {
       price: price.trim(),
       priceNumeric,
       images,
+      videoUrls: validVideoUrls.map((url) => url.trim()),
       features: validFeatures.map((f) => f.trim()),
       viewsRange: [
         parseInt(viewsRange[0]) || 100,
@@ -340,6 +347,14 @@ const updateListing = async (req, res) => {
         });
       }
       updateData.features = validFeatures.map((f) => f.trim());
+    }
+
+    // Validate and clean video URLs if provided
+    if (updateData.videoUrls !== undefined) {
+      const validVideoUrls = updateData.videoUrls.filter(
+        (url) => url && typeof url === "string" && url.trim() !== ""
+      );
+      updateData.videoUrls = validVideoUrls.map((url) => url.trim());
     }
 
     // Validate images if provided

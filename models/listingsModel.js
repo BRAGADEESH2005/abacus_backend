@@ -57,6 +57,19 @@ const listingSchema = new mongoose.Schema(
         message: "At least one image is required",
       },
     },
+    videoUrls: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function (arr) {
+          if (!arr) return true;
+          return arr.every(
+            (url) => typeof url === "string" && url.trim() !== ""
+          );
+        },
+        message: "All video URLs must be non-empty strings",
+      },
+    },
     features: {
       type: [String],
       required: [true, "At least one feature is required"],

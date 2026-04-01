@@ -10,6 +10,7 @@ const leadRoutes = require("./routes/leadRoute");
 const contentRoutes = require("./routes/contentRoute"); // Add this line
 const subscriptionRoute = require("./routes/subscriptionRoute");
 const contactRoute = require("./routes/contactRoute"); // Add this line
+const heatmapRoutes = require("./routes/heatmapRoute"); // Add this line
 // Initialize Express app
 const app = express();
 // Middleware
@@ -87,6 +88,7 @@ app.use("/api/leads", leadRoutes);
 app.use("/api/content", contentRoutes); // Add this line
 app.use("/api/subscriptions", subscriptionRoute);
 app.use("/api/contact", contactRoute); // Add this line
+app.use("/api/heatmap", heatmapRoutes); // Add this line
 // Handle undefined routes
 app.use((req, res) => {
   res.status(404).json({
@@ -121,6 +123,7 @@ const server = app.listen(PORT, () => {
   console.log(`👥 Leads API: http://localhost:${PORT}/api/leads`);
   console.log(`📝 Content API: http://localhost:${PORT}/api/content`); // Add this line
   console.log(`📧 Contact API: http://localhost:${PORT}/api/contact`); // Add this line
+  console.log(`🗺️  Heatmap API: http://localhost:${PORT}/api/heatmap`); // Add this line
 });
 
 // Handle unhandled promise rejections

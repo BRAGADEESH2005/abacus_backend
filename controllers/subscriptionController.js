@@ -99,7 +99,7 @@ const generateSubscriberWelcomeEmail = (email) => {
           <p style="margin-top: 30px;">
             <strong>Need assistance?</strong><br>
             Our team is here to help you find the perfect commercial space.<br>
-            📞 Phone: +91 9876543210<br>
+            📞 Phone: +91 7339544927<br>
             📧 Email: info@abacusspaces.com<br>
             🌐 Website: www.abacusspaces.com
           </p>
@@ -225,26 +225,30 @@ const subscribe = async (req, res) => {
       // If previously unsubscribed, reactivate
       if (existingSubscription.status === "unsubscribed") {
         await existingSubscription.resubscribe();
-        
+
         // Send welcome back email
         if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
           try {
             const transporter = createEmailTransporter();
-            const welcomeEmail = generateSubscriberWelcomeEmail(existingSubscription.email);
-            
+            const welcomeEmail = generateSubscriberWelcomeEmail(
+              existingSubscription.email,
+            );
+
             await transporter.sendMail({
               from: `"Abacus Spaces" <${process.env.EMAIL_USER}>`,
               to: existingSubscription.email,
               subject: "🎉 Welcome Back to Abacus Spaces!",
               html: welcomeEmail,
             });
-            
-            console.log(`Welcome back email sent to: ${existingSubscription.email}`);
+
+            console.log(
+              `Welcome back email sent to: ${existingSubscription.email}`,
+            );
           } catch (emailError) {
             console.error("Welcome back email failed:", emailError.message);
           }
         }
-        
+
         return res.status(200).json({
           success: true,
           message: "Welcome back! You've been resubscribed successfully.",
@@ -288,8 +292,10 @@ const subscribe = async (req, res) => {
     });
 
     await subscription.save();
-    
-    console.log(`New subscription created: ${subscription._id} - ${subscription.email}`);
+
+    console.log(
+      `New subscription created: ${subscription._id} - ${subscription.email}`,
+    );
 
     // Send emails
     if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
@@ -297,14 +303,14 @@ const subscribe = async (req, res) => {
       try {
         const transporter = createEmailTransporter();
         const welcomeEmail = generateSubscriberWelcomeEmail(subscription.email);
-        
+
         await transporter.sendMail({
           from: `"Abacus Spaces" <${process.env.EMAIL_USER}>`,
           to: subscription.email,
           subject: "🎉 Welcome to Abacus Spaces Newsletter!",
           html: welcomeEmail,
         });
-        
+
         console.log(`Welcome email sent to: ${subscription.email}`);
       } catch (emailError) {
         console.error("Welcome email failed:", emailError.message);
@@ -314,16 +320,19 @@ const subscribe = async (req, res) => {
       // Send notification to admin
       try {
         const transporter = createEmailTransporter();
-        const adminNotification = generateAdminSubscriptionNotification(subscription);
-        
+        const adminNotification =
+          generateAdminSubscriptionNotification(subscription);
+
         await transporter.sendMail({
           from: `"Abacus Spaces" <${process.env.EMAIL_USER}>`,
           to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
           subject: `📧 New Newsletter Subscription - ${subscription.email}`,
           html: adminNotification,
         });
-        
-        console.log(`Admin notification sent for subscription: ${subscription._id}`);
+
+        console.log(
+          `Admin notification sent for subscription: ${subscription._id}`,
+        );
       } catch (emailError) {
         console.error("Admin notification failed:", emailError.message);
       }
@@ -404,14 +413,14 @@ const unsubscribe = async (req, res) => {
     }
 
     await subscription.unsubscribe(req.body.reason);
-    
+
     console.log(`Subscription unsubscribed: ${subscription.email}`);
 
     // Send confirmation email
     if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
       try {
         const transporter = createEmailTransporter();
-        
+
         await transporter.sendMail({
           from: `"Abacus Spaces" <${process.env.EMAIL_USER}>`,
           to: subscription.email,
@@ -448,10 +457,13 @@ const unsubscribe = async (req, res) => {
             </html>
           `,
         });
-        
+
         console.log(`Unsubscribe confirmation sent to: ${subscription.email}`);
       } catch (emailError) {
-        console.error("Unsubscribe confirmation email failed:", emailError.message);
+        console.error(
+          "Unsubscribe confirmation email failed:",
+          emailError.message,
+        );
       }
     }
 

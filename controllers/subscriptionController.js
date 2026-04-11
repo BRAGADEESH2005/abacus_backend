@@ -83,7 +83,7 @@ const generateSubscriberWelcomeEmail = (email) => {
           <div class="info-section" style="text-align: center;">
             <h3>Explore Our Offerings</h3>
             <p>Discover premium commercial spaces perfect for your business</p>
-            <a href="https://www.abacusspaces.com/listings" class="cta-button">Browse Properties</a>
+            <a href="https://www.abacuspaces.com/listings" class="cta-button">Browse Properties</a>
           </div>
           
           <div class="info-section">
@@ -100,8 +100,8 @@ const generateSubscriberWelcomeEmail = (email) => {
             <strong>Need assistance?</strong><br>
             Our team is here to help you find the perfect commercial space.<br>
             📞 Phone: +91 7339544927<br>
-            📧 Email: info@abacusspaces.com<br>
-            🌐 Website: www.abacusspaces.com
+            📧 Email: info@abacuspaces.com<br>
+            🌐 Website: www.abacuspaces.com
           </p>
         </div>
         
@@ -109,7 +109,7 @@ const generateSubscriberWelcomeEmail = (email) => {
           <p><strong>Abacus Spaces</strong> - Spaces That Mean Business</p>
           <p style="margin-top: 15px; font-size: 12px; color: #999;">
             You're receiving this email because you subscribed to Abacus Spaces updates.<br>
-            Don't want to receive these emails? <a href="https://www.abacusspaces.com/unsubscribe?email=${encodeURIComponent(email)}" style="color: #23c6a4;">Unsubscribe</a>
+            Don't want to receive these emails? <a href="https://www.abacuspaces.com/unsubscribe?email=${encodeURIComponent(email)}" style="color: #23c6a4;">Unsubscribe</a>
           </p>
         </div>
       </div>
@@ -450,7 +450,7 @@ const unsubscribe = async (req, res) => {
                 </div>
                 <div class="footer">
                   <p><strong>Abacus Spaces</strong></p>
-                  <p>🌐 www.abacusspaces.com</p>
+                  <p>🌐 www.abacuspaces.com</p>
                 </div>
               </div>
             </body>

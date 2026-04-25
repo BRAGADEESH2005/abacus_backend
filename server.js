@@ -4,6 +4,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
+const { client: redisClient } = require("./utils/cacheManager");
 const listingsRoutes = require("./routes/listingsRoute");
 const imageRoutes = require("./routes/imageRoute");
 const leadRoutes = require("./routes/leadRoute");
@@ -121,9 +122,23 @@ const server = app.listen(PORT, () => {
   console.log(`📋 Listings API: http://localhost:${PORT}/api/listings`);
   console.log(`🖼️  Images API: http://localhost:${PORT}/api/images`);
   console.log(`👥 Leads API: http://localhost:${PORT}/api/leads`);
-  console.log(`📝 Content API: http://localhost:${PORT}/api/content`); // Add this line
-  console.log(`📧 Contact API: http://localhost:${PORT}/api/contact`); // Add this line
-  console.log(`🗺️  Heatmap API: http://localhost:${PORT}/api/heatmap`); // Add this line
+  console.log(`📝 Content API: http://localhost:${PORT}/api/content`);
+  console.log(`📧 Contact API: http://localhost:${PORT}/api/contact`);
+  console.log(`🗺️  Heatmap API: http://localhost:${PORT}/api/heatmap`);
+});
+
+// Handle graceful shutdown for Redis
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM signal received: closing HTTP server");
+  try {
+    await redisClient.quit();
+    console.log("Redis connection closed");
+  } catch (err) {
+    console.error("Error closing Redis:", err);
+  }
+  server.close(() => {
+    process.exit(0);
+  });
 });
 
 // Handle unhandled promise rejections

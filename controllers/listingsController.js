@@ -3,6 +3,12 @@ const {
   generatePropertyCode,
   getPropertyCodeStats,
 } = require("../utils/propertyCodeGenerator");
+const {
+  generateCacheKey,
+  getCache,
+  setCache,
+  clearCachePattern,
+} = require("../utils/cacheManager");
 
 // Helper function to validate property code format
 const validatePropertyCodeFormat = (propertyCode) => {
@@ -35,6 +41,25 @@ const getListings = async (req, res) => {
       sortBy = "createdAt",
       sortOrder = "desc",
     } = req.query;
+
+    // Generate cache key
+    const cacheKey = generateCacheKey("listings", {
+      page,
+      limit,
+      type,
+      location,
+      search,
+      minPrice,
+      maxPrice,
+      sortBy,
+      sortOrder,
+    });
+
+    // Check cache first
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
 
     // Build filter object
     const filter = {};
@@ -76,7 +101,7 @@ const getListings = async (req, res) => {
     // Get total count for pagination
     const total = await Listing.countDocuments(filter);
 
-    res.status(200).json({
+    const response = {
       success: true,
       data: listings,
       pagination: {
@@ -93,7 +118,12 @@ const getListings = async (req, res) => {
         minPrice,
         maxPrice,
       },
-    });
+    };
+
+    // Cache the response for 10 minutes
+    await setCache(cacheKey, response, 600);
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Error fetching listings:", error);
     res.status(500).json({
@@ -184,7 +214,7 @@ const createListing = async (req, res) => {
 
     // Validate and clean video URLs
     const validVideoUrls = videoUrls.filter(
-      (url) => url && typeof url === "string" && url.trim() !== ""
+      (url) => url && typeof url === "string" && url.trim() !== "",
     );
 
     // Handle property code: use provided value if valid, otherwise auto-generate
@@ -258,6 +288,9 @@ const createListing = async (req, res) => {
 
     console.log(`✅ Created listing with property code: ${propertyCode}`);
 
+    // Clear listings cache when new listing is created
+    await clearCachePattern("listings:*");
+
     res.status(201).json({
       success: true,
       message: "Listing created successfully",
@@ -287,7 +320,12 @@ const createListing = async (req, res) => {
 const updateListing = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Received update listing request for ID:", id, "with data:", req.body);
+    console.log(
+      "Received update listing request for ID:",
+      id,
+      "with data:",
+      req.body,
+    );
     const updateData = { ...req.body };
 
     // Check if listing exists
@@ -352,7 +390,7 @@ const updateListing = async (req, res) => {
     // Validate and clean video URLs if provided
     if (updateData.videoUrls !== undefined) {
       const validVideoUrls = updateData.videoUrls.filter(
-        (url) => url && typeof url === "string" && url.trim() !== ""
+        (url) => url && typeof url === "string" && url.trim() !== "",
       );
       updateData.videoUrls = validVideoUrls.map((url) => url.trim());
     }
@@ -386,6 +424,9 @@ const updateListing = async (req, res) => {
     );
 
     console.log(`✅ Updated listing: ${updatedListing.propertyCode}`);
+
+    // Clear listings cache when listing is updated
+    await clearCachePattern("listings:*");
 
     res.status(200).json({
       success: true,
@@ -427,6 +468,9 @@ const deleteListing = async (req, res) => {
     }
 
     console.log(`🗑️ Deleted listing: ${deletedListing.propertyCode}`);
+
+    // Clear listings cache when listing is deleted
+    await clearCachePattern("listings:*");
 
     res.status(200).json({
       success: true,

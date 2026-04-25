@@ -3,6 +3,12 @@ const {
   uploadToCloudinary,
   deleteFromCloudinary,
 } = require("../config/cloudinary");
+const {
+  generateCacheKey,
+  getCache,
+  setCache,
+  clearCachePattern,
+} = require("../utils/cacheManager");
 
 // @desc    Create new content
 // @route   POST /api/content
@@ -63,6 +69,9 @@ const createContent = async (req, res) => {
       views: views || 0,
     });
 
+    // Clear content cache when new content is created
+    await clearCachePattern("content:*");
+
     res.status(201).json({
       success: true,
       message: "Content created successfully",
@@ -92,6 +101,23 @@ const getAllContent = async (req, res) => {
       sort = "-date",
       search,
     } = req.query;
+
+    // Generate cache key
+    const cacheKey = generateCacheKey("content", {
+      type,
+      sector,
+      status,
+      page,
+      limit,
+      sort,
+      search,
+    });
+
+    // Check cache first
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      return res.status(200).json(cachedData);
+    }
 
     // Build query
     const query = {};
@@ -125,14 +151,19 @@ const getAllContent = async (req, res) => {
       .limit(limitNum)
       .select("-__v");
 
-    res.status(200).json({
+    const response = {
       success: true,
       count: content.length,
       total,
       page: pageNum,
       pages: Math.ceil(total / limitNum),
       data: content,
-    });
+    };
+
+    // Cache the response for 1 hour (content changes less frequently)
+    await setCache(cacheKey, response, 3600);
+
+    res.status(200).json(response);
   } catch (error) {
     console.error("Get all content error:", error);
     res.status(500).json({
@@ -275,6 +306,9 @@ const updateContent = async (req, res) => {
     // Save updated content
     await content.save();
 
+    // Clear content cache when content is updated
+    await clearCachePattern("content:*");
+
     res.status(200).json({
       success: true,
       message: "Content updated successfully",
@@ -315,6 +349,9 @@ const deleteContent = async (req, res) => {
 
     // Delete content
     await Content.findByIdAndDelete(req.params.id);
+
+    // Clear content cache when content is deleted
+    await clearCachePattern("content:*");
 
     res.status(200).json({
       success: true,

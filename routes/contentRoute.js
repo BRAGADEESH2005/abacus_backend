@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   createContent,
+  createGeneratedBlog,
   getAllContent,
   getContentById,
   getContentBySlug,
@@ -20,6 +22,10 @@ router.get("/:id", getContentById);
 
 // Private routes (add authentication middleware if needed)
 router.post("/", createContent);
+
+// Endpoint for AI-generated blogs
+router.post("/generated-blog", createGeneratedBlog);
+
 router.put("/:id", updateContent);
 router.delete("/:id", deleteContent);
 

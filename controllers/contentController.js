@@ -87,6 +87,61 @@ const createContent = async (req, res) => {
   }
 };
 
+const createGeneratedBlog = async (req, res) => {
+  try {
+    const { title, text } = req.body;
+
+    if (!title || !text) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide title and text",
+      });
+    }
+
+    const imageUrl =
+      "https://res.cloudinary.com/dn4izgmag/image/upload/v1784178272/logo_abacus_nsmzr6.png";
+
+    const imageData = {
+      url: imageUrl,
+      publicId: imageUrl.split("/").slice(-2).join("/").split(".")[0],
+    };
+
+    const content = await Content.create({
+      type: "Blog",
+      sector: "Office Space",
+      title,
+      text,
+      date: Date.now(),
+      image: imageData,
+      status: "Published",
+      author: "Abacus Spaces",
+      tags: [],
+      views: 0,
+    });
+
+    await clearCachePattern("content:*");
+    console.log("Generated blog created with ID:", content._id);
+
+    return res.status(201).json({
+      success: true,
+      message: "Generated blog published successfully",
+      data: {
+        id: content._id,
+        title: content.title,
+        slug: content.slug,
+        blogUrl: `https://abacuspaces.com/content/${content.slug}`,
+      },
+    });
+  } catch (error) {
+    console.error("Create generated blog error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create generated blog",
+    });
+  }
+};
+
 // @desc    Get all content with filtering and pagination
 // @route   GET /api/content
 // @access  Public
@@ -436,6 +491,7 @@ const getLatestContent = async (req, res) => {
 
 module.exports = {
   createContent,
+  createGeneratedBlog,
   getAllContent,
   getContentById,
   getContentBySlug,

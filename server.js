@@ -27,6 +27,11 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use("/api", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 // Connect to MongoDB
 connectDB();
 
@@ -92,6 +97,7 @@ app.use("/api/content", contentRoutes); // Add this line
 app.use("/api/subscriptions", subscriptionRoute);
 app.use("/api/contact", contactRoute); // Add this line
 app.use("/api/heatmap", heatmapRoutes); // Add this line
+
 // Handle undefined routes
 app.use((req, res) => {
   res.status(404).json({

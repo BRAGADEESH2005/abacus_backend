@@ -18,6 +18,7 @@ const app = express();
 app.use(
   cors({
     origin: [
+      "https://www.abacuspaces.com",
       "https://abacuspaces.com",
       "https://abacus-space.vercel.app",
       "http://localhost:3000",

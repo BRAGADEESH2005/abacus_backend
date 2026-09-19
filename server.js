@@ -21,6 +21,7 @@ app.use(
       "https://abacuspaces.com",
       "https://abacus-space.vercel.app",
       "http://localhost:3000",
+      "https://nextjsabacuspaces-buin.vercel.app",
     ],
     credentials: true,
   }),
